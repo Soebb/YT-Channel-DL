@@ -284,7 +284,12 @@ async def uloader(client, message):
                             supports_streaming=True,
                             duration=fduration,
                             width=fwidth,
-                            height=fheight)
+                            height=fheight,
+                            progress=progress_bar,
+                            progress_args=(
+                                "downloading", msg, c_time
+                            )
+                        )
                     except Exception as e:
                         await msg.edit("{} caused `{}`".format(single_file, str(e)))
                         continue
