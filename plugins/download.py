@@ -33,51 +33,44 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger(__name__)
 
-# --- PROGRESS DEF --- #
-'''async def progress_for_pyrogram(
-    current,
-    total,
-    ud_type,
-    message,
-    start
-):
+
+async def progress_bar(current, total, text, message, start):
+
     now = time.time()
-    diff = now - start
-    if round(diff % 10.00) == 0 or current == total:
-        # if round(current / total * 100, 0) % 5 == 0:
-        percentage = current * 100 / total
-        speed = current / diff
-        elapsed_time = round(diff) * 1000
-        time_to_completion = round((total - current) / speed) * 1000
-        estimated_total_time = elapsed_time + time_to_completion
+    diff = now-start
+    if round(diff % 10) == 0 or current == total:
+        percentage = current*100/total
+        speed = current/diff
+        elapsed_time = round(diff)*1000
+        eta = round((total-current)/speed)*1000
+        ett = eta + elapsed_time
 
-        elapsed_time = time_formatter(milliseconds=elapsed_time)
-        estimated_total_time = time_formatter(milliseconds=estimated_total_time)
+        elapsed_time = TimeFormatter(elapsed_time)
+        ett = TimeFormatter(ett)
 
-        progress = "[{0}{1}] \nP: {2}%\n".format(
-            ''.join(["█" for i in range(math.floor(percentage / 5))]),
-            ''.join(["░" for i in range(20 - math.floor(percentage / 5))]),
+        progress = "[{0}{1}] \n\n🔹Progress: {2}%\n".format(
+            ''.join(["◼️" for i in range(math.floor(percentage / 5))]),
+            ''.join(["◻️" for i in range(20 - math.floor(percentage / 5))]),
             round(percentage, 2))
 
-        tmp = progress + "{0} of {1}\nSpeed: {2}/s\nETA: {3}\n".format(
+        tmp = progress + "{0} of {1}\n\n️🔹Speed: {2}/s\n\n🔹ETA: {3}\n".format(
             humanbytes(current),
             humanbytes(total),
             humanbytes(speed),
             # elapsed_time if elapsed_time != '' else "0 s",
-            estimated_total_time if estimated_total_time != '' else "0 s"
+            ett if ett != '' else "0 s"
         )
-        try:
+
+        try :
             await message.edit(
-                text="{}\n {}".format(
-                    ud_type,
-                    tmp
-                )
+                text = '{}.\n{}'.format(text, tmp)
             )
         except:
-            pass'''
+            pass
 
-# --- HUMANBYTES DEF --- #
 def humanbytes(size):
+    # https://stackoverflow.com/a/49361727/4723940
+    # 2**10 = 1024
     if not size:
         return ""
     power = 2**10
@@ -88,20 +81,19 @@ def humanbytes(size):
         n += 1
     return str(round(size, 2)) + " " + Dic_powerN[n] + 'B'
 
-# --- TIME FORMATTER DEF --- #
-def time_formatter(milliseconds: int) -> str:
+
+def TimeFormatter(milliseconds: int) -> str:
     seconds, milliseconds = divmod(int(milliseconds), 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = ((str(days) + "days, ") if days else "") + \
-        ((str(hours) + " hours, ") if hours else "") + \
-        ((str(minutes) + " minites, ") if minutes else "") + \
-        ((str(seconds) + " seconds, ") if seconds else "") + \
-        ((str(milliseconds) + " milliseconds, ") if milliseconds else "")
+    tmp = ((str(days) + "d, ") if days else "") + \
+        ((str(hours) + "h, ") if hours else "") + \
+        ((str(minutes) + "m, ") if minutes else "") + \
+        ((str(seconds) + "s, ") if seconds else "") + \
+        ((str(milliseconds) + "ms, ") if milliseconds else "")
     return tmp[:-2]
 
-# --- YTDL DOWNLOADER --- #
 def ytdl_dowload(result, opts):
     global is_downloading
     try:
@@ -257,7 +249,9 @@ async def uloader(client, message):
                             message.chat.id,
                             single_file,
                             caption=f"`{audioname}`",
-                            duration=fduration)
+                            duration=fduration,
+                            progress=progress_bar,
+                            progress_args=('Initializing', downloading, start_time))
                     except Exception as e:
                         await msg.edit("{} caused `{}`".format(single_file, str(e)))
                         continue
