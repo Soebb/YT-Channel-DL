@@ -231,10 +231,12 @@ async def uloader(client, message):
         return await msg.edit("Error: "+e)
 
     c_time = time.time()
+    '''
     try:
         await msg.edit("`Uploading...`")
     except MessageNotModified:
         pass
+    '''
     if song:
         for single_file in filename:
             if os.path.exists(single_file):
@@ -251,7 +253,10 @@ async def uloader(client, message):
                             caption=f"`{audioname}`",
                             duration=fduration,
                             progress=progress_bar,
-                            progress_args=('Initializing', downloading, start_time))
+                            progress_args=(
+                                "downloading", msg, c_time
+                            )
+                        )
                     except Exception as e:
                         await msg.edit("{} caused `{}`".format(single_file, str(e)))
                         continue
