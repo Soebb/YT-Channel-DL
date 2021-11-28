@@ -1,4 +1,4 @@
-## Youtube Channel DL Bot
+## Youtube Channel DL Bo
 _A Telegram bot to download youtube channel contents and upload them to telegram. (may be slow becoz youtube limitations)_
 
 ## 📌 Deploy to Heroku
