@@ -112,7 +112,10 @@ async def uloader(client, message):
     if fsub:
         if not (await pyro_fsub(client, message, fsub) == True):
             return
-
+    Fgg = "fghdd.mp4"
+    print(Fgg.rsplit('.', 1)[1])
+    print(Fgg.rsplit('.', 1)[-1])
+    return
     if is_downloading:
         return await message.reply_text(
             "`Another download is in progress, try again after sometime.`",
